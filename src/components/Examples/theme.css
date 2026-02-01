@@ -1,0 +1,33 @@
+@layer base {
+  :root {
+    --background: 220 15% 10%; /* Dark olive-charcoal */
+    --foreground: 60 30% 95%; /* Light cream */
+
+    --card: 220 15% 12%;
+    --card-foreground: 60 30% 95%;
+
+    --popover: 220 15% 8%;
+    --popover-foreground: 60 30% 95%;
+
+    --primary: 80 40% 50%; /* Olive green */
+    --primary-foreground: 60 30% 98%;
+
+    --secondary: 80 25% 30%;
+    --secondary-foreground: 60 30% 98%;
+
+    --muted: 220 15% 20%;
+    --muted-foreground: 220 15% 65%;
+
+    --accent: 80 30% 40%;
+    --accent-foreground: 60 30% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 60 30% 98%;
+
+    --border: 220 15% 25%;
+    --input: 220 15% 25%;
+    --ring: 80 40% 55%;
+
+    --radius: 0.5rem;
+  }
+}

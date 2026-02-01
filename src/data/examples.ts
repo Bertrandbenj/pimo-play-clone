@@ -4,6 +4,7 @@ export interface Example {
   description: string;
   yaml: string;
   input: string;
+  url?: string;
 }
 
 export interface ExampleCategory {
@@ -270,7 +271,20 @@ masking:
         input: `{"user": {"name": "John", "contact": {"email": "john@real.com", "phone": "12-345-6789"}}}`
       }
     ]
-  }
+  },
+  {
+    name: "Workspace",
+    examples: [
+       {
+        id: "ex-file-template",
+        name: "petstore/owners-descriptor.yaml",
+        description: "Template Mask from workspace file",
+        url: "/api/file/petstore/owners-descriptor.yaml",
+        input: `{"firstname": "Jean", "lastname": "Dupont", "fullname": ""}`,
+        yaml: ""
+      }
+    ]
+  } 
 ];
 
 export const defaultExample = exampleCategories[0].examples[0];

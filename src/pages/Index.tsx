@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { PimoHeader } from '@/components/Layout/PimoHeader';
 import { ExamplesSidebar } from '@/components/Examples/ExamplesSidebar';
 import { MaskingConfigPanel } from '@/components/Editors/MaskingConfigPanel';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { InputEditor } from '@/components/Editors/InputEditor';
 import { OutputViewer } from '@/components/Editors/OutputViewer';
 import {
@@ -19,6 +20,26 @@ const Index = () => {
   const [jsonOutput, setJsonOutput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+
+  const setFileConfig = useCallback(async (url: string) => {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const text = await response.text();
+        setYamlConfig(text);
+      } else {
+        toast({
+          title: "Error loading file",
+          description: `Failed to fetch file from ${url}`,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : `Unknown error fetching from ${url}`;
+      toast({ title: "Error", description: message, variant: "destructive" });
+    }
+  }, []);
   
   const handleExecute = useCallback(async () => {
     setIsLoading(true);
@@ -46,13 +67,23 @@ const Index = () => {
   }, [yamlConfig, jsonInput]);
   
   const handleSelectExample = useCallback((example: Example) => {
-    setYamlConfig(example.yaml);
+    if  (example.yaml != "" ){
+      setYamlConfig(example.yaml);
+    }else{ 
+      setFileConfig(example.url);
+    }
+    
     setJsonInput(example.input);
     setJsonOutput('');
     toast({
       title: "Example Loaded",
       description: example.name,
     });
+  }, [setFileConfig]);
+  
+  const handleFileSelect = useCallback((path: string, content: string) => {
+    setYamlConfig(content);
+    setSelectedFile(path);
   }, []);
   
   return (
@@ -61,43 +92,49 @@ const Index = () => {
       
       <div className="flex-1 flex overflow-hidden">
         {/* Examples Sidebar */}
-        <ExamplesSidebar
-          onSelectExample={handleSelectExample}
-          isOpen={sidebarOpen}
-          onToggle={() => setSidebarOpen(!sidebarOpen)}
-        />
-        
-        {/* Main Editor Area */}
-        <ResizablePanelGroup direction="horizontal" className="flex-1">
-          {/* Left Panel - Masking Config */}
-          <ResizablePanel defaultSize={50} minSize={30}>
-            <MaskingConfigPanel
-              yamlValue={yamlConfig}
-              onYamlChange={setYamlConfig}
-            />
-          </ResizablePanel>
+        <SidebarProvider defaultOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <ExamplesSidebar
+            onSelectExample={handleSelectExample}
+            onFileSelect={handleFileSelect}
+            selectedFile={selectedFile}
+            isOpen={sidebarOpen}
+            onToggle={() => setSidebarOpen(!sidebarOpen)}
+          />
           
-          <ResizableHandle withHandle />
-          
-          {/* Right Panel - Input/Output */}
-          <ResizablePanel defaultSize={50} minSize={30}>
-            <ResizablePanelGroup direction="vertical">
-              <ResizablePanel defaultSize={50} minSize={20}>
-                <InputEditor value={jsonInput} onChange={setJsonInput} />
+          {/* Main Editor Area */}
+          <SidebarInset>
+            <ResizablePanelGroup direction="horizontal" className="flex-1">
+              {/* Left Panel - Masking Config */}
+              <ResizablePanel defaultSize={50} minSize={30}>
+                <MaskingConfigPanel
+                  yamlValue={yamlConfig}
+                  onYamlChange={setYamlConfig}
+                />
               </ResizablePanel>
               
               <ResizableHandle withHandle />
               
-              <ResizablePanel defaultSize={50} minSize={20}>
-                <OutputViewer
-                  value={jsonOutput}
-                  onRefresh={handleExecute}
-                  isLoading={isLoading}
-                />
+              {/* Right Panel - Input/Output */}
+              <ResizablePanel defaultSize={50} minSize={30}>
+                <ResizablePanelGroup direction="vertical">
+                  <ResizablePanel defaultSize={50} minSize={20}>
+                    <InputEditor value={jsonInput} onChange={setJsonInput} />
+                  </ResizablePanel>
+                  
+                  <ResizableHandle withHandle />
+                  
+                  <ResizablePanel defaultSize={50} minSize={20}>
+                    <OutputViewer
+                      value={jsonOutput}
+                      onRefresh={handleExecute}
+                      isLoading={isLoading}
+                    />
+                  </ResizablePanel>
+                </ResizablePanelGroup>
               </ResizablePanel>
             </ResizablePanelGroup>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+          </SidebarInset>
+        </SidebarProvider>
       </div>
     </div>
   );

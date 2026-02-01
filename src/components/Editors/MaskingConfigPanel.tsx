@@ -13,7 +13,7 @@ export function MaskingConfigPanel({ yamlValue, onYamlChange }: MaskingConfigPan
   const handleLoadFromLocal = (yaml: string) => {
     onYamlChange(yaml);
   };
-  
+
   return (
     <div className="flex flex-col h-full">
       <Tabs defaultValue="yaml" className="flex flex-col h-full">
@@ -39,7 +39,7 @@ export function MaskingConfigPanel({ yamlValue, onYamlChange }: MaskingConfigPan
         </TabsContent>
         
         <TabsContent value="graph" className="flex-1 m-0 overflow-hidden">
-          <GraphView yamlConfig={yamlValue} />
+          <GraphView />
         </TabsContent>
         
         <TabsContent value="local" className="flex-1 m-0 overflow-hidden">
